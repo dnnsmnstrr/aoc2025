@@ -17,43 +17,42 @@ const part1 = (rawInput: string) => {
   lines.forEach(line => {
     const direction = line[0];
     const count = Number(line.slice(1))
-    // console.log(direction, count)
     if (direction === 'L') {
       dialPosition = dialPosition - count;
     } else {
       dialPosition = dialPosition + count;
     }
     dialPosition = normalizePosition(dialPosition)
-    console.log(dialPosition)
     if (dialPosition === 0) zeroCount++
   })
 
-  return zeroCount
+  return String(zeroCount)
 }
 
 const part2 = (rawInput: string) => {
-    const input = parseInput(rawInput)
-    const lines = input.split('\n');
-    let dialPosition = initialPosition
-    let zeroCount = 0;
-    lines.forEach(line => {
-      const direction = line[0];
-      const count = Number(line.slice(1))
-      // console.log(direction, count)
-      if (direction === 'L') {
-        dialPosition = dialPosition - count;
-      } else {
-        dialPosition = dialPosition + count;
-      }
-      if (dialPosition < 0) zeroCount++
-      if (dialPosition > totalPositions) zeroCount += Math.floor(count / totalPositions)
-      console.log('before', dialPosition, 'count', count)
-      dialPosition = normalizePosition(dialPosition)
-      console.log('after', dialPosition)
-      if (dialPosition === 0) zeroCount++
-    })
-    
-    return zeroCount
+  const input = parseInput(rawInput)
+  const lines = input.split('\n');
+  let dialPosition = initialPosition
+  let zeroCount = 0;
+  lines.forEach(line => {
+    const direction = line[0];
+    const count = Number(line.slice(1))
+
+    const fullRotations = Math.floor(count / totalPositions);
+    zeroCount += fullRotations;
+    const restRotation = Math.abs(count) % totalPositions;
+    let finalPosition;
+    if (direction === 'L') {
+      finalPosition = dialPosition - restRotation;
+      if (finalPosition < 0) zeroCount++;
+    } else {
+      finalPosition = dialPosition + restRotation;
+      if (dialPosition >0) zeroCount++
+    }
+    dialPosition = normalizePosition(finalPosition)
+  })
+
+  return String(zeroCount)
 }
 
 run({
@@ -77,6 +76,18 @@ L82`,
   },
   part2: {
     tests: [
+      {
+        input: `R50`,
+        expected: "1",
+      },
+      {
+        input: `R150`,
+        expected: "2",
+      },
+      {
+        input: `L68`,
+        expected: "1",
+      },
       {
         input: `L68
 L30
